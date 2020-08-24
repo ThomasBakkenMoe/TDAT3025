@@ -1,9 +1,29 @@
 import torch
 import matplotlib.pyplot as plt
+import _csv
+
+learning_rate = 0.0001
+epoch_amount = 155000
+
+x_array = []
+y_array = []
+first_row = True
+
+with open('csv/length_weight.csv', 'r') as file:
+    reader = _csv.reader(file)
+    for row in reader:
+        if first_row:
+            first_row = False
+            continue
+
+        x_array.append(float(row[0]))
+        y_array.append(float(row[1]))
+        print(row)
+
 
 # Observed/training input and output
-x_train = torch.tensor([1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0]).reshape(-1, 1)  # x_train = [[1], [1.5], [2], [3], [4], [5], [6]]
-y_train = torch.tensor([5.0, 3.5, 3.0, 4.0, 3.0, 1.5, 2.0]).reshape(-1, 1)  # y_train = [[5], [3.5], [3], [4], [3], [1.5], [2]]
+x_train = torch.tensor(x_array).reshape(-1, 1)  # x_train = [[1], [1.5], [2], [3], [4], [5], [6]]
+y_train = torch.tensor(y_array).reshape(-1, 1)  # y_train = [[5], [3.5], [3], [4], [3], [1.5], [2]]
 
 
 class LinearRegressionModel:
@@ -24,8 +44,8 @@ class LinearRegressionModel:
 model = LinearRegressionModel()
 
 # Optimize: adjust W and b to minimize loss using stochastic gradient descent
-optimizer = torch.optim.SGD([model.W, model.b], 0.01)
-for epoch in range(1000):
+optimizer = torch.optim.SGD([model.W, model.b], learning_rate)
+for epoch in range(epoch_amount):
     model.loss(x_train, y_train).backward()  # Compute loss gradients
     optimizer.step()  # Perform optimization by adjusting W and b,
     # similar to:
