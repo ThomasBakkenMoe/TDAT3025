@@ -1,41 +1,16 @@
 import torch
 import matplotlib.pyplot as plt
 import _csv
+import pandas as pd
 
 learning_rate = 0.0001
 epoch_amount = 65000
 
-day = []
-length = []
-weight = []
-
-x_array = []
-y_array = []
-first_row = True
-
-with open('csv/day_length_weight.csv', 'r') as file:
-    reader = _csv.reader(file)
-    for row in reader:
-        if first_row:
-            first_row = False
-            continue
-
-        day.append(float(row[0]))
-        length.append(float(row[1]))
-        weight.append(float(row[2]))
-
-        y_array.append(float(row[0]))  # Add the number of days to the y training array
-
-x_array = [length, weight]
-
-# Observed/training input and output
-x_train = torch.tensor(x_array, dtype=torch.float).t()
-y_train = torch.tensor(y_array, dtype=torch.float).t().reshape(-1, 1)
 
 class LinearRegressionModel:
     def __init__(self):
         # Model variables
-        self.W = torch.tensor([[0.0]], requires_grad=True)  # requires_grad enables calculation of gradients
+        self.W = torch.tensor([[0.0], [0.0]], requires_grad=True)  # requires_grad enables calculation of gradients
         self.b = torch.tensor([[0.0]], requires_grad=True)
 
     # Predictor
@@ -45,6 +20,18 @@ class LinearRegressionModel:
     # Uses Mean Squared Error
     def loss(self, x, y):
         return torch.nn.functional.mse_loss(self.f(x), y)  # Can also use torch.nn.functional.mse_loss(self.f(x), y) to possibly increase numberical stability
+
+
+data = pd.read_csv("csv/day_length_weight.csv")
+
+x_data = [data["length"].tolist(), data["weight"].tolist()]
+y_data = data["day"].tolist()
+
+
+# Observed/training input and output
+x_train = torch.tensor(x_data, dtype=torch.float).t()
+
+y_train = torch.tensor(y_data, dtype=torch.float).t().reshape(-1, 1)
 
 
 model = LinearRegressionModel()
@@ -67,13 +54,15 @@ print("W = %s, b = %s, loss = %s" % (model.W, model.b, model.loss(x_train, y_tra
 # Visualize result
 figure = plt.figure().gca(projection='3d')
 
-figure.scatter(length, weight, day, c='red')
+# Plot data points
+figure.scatter(data["length"].tolist(), data["weight"].tolist(), data["day"].tolist(), c='red')
 
-figure.scatter(length, weight, model.f(x_train).detach(), label='$y = f(x) = xW+b$')
+# Plot Regression line
+figure.scatter(data["length"].tolist(), data["weight"].tolist(), model.f(x_train).detach(), label='$y = f(x) = xW+b$')
 
 # Plot labels
-figure.set_xlabel('Length cm')
-figure.set_ylabel('Weight kg')
-figure.set_zlabel('Age in days')
+figure.set_xlabel('Length (cm)')
+figure.set_ylabel('Weight (kg)')
+figure.set_zlabel('Age (days)')
 
 plt.show()
