@@ -25,14 +25,12 @@ with open('csv/day_length_weight.csv', 'r') as file:
         weight.append(float(row[2]))
 
         y_array.append(float(row[0]))  # Add the number of days to the y training array
-        print(row)
 
 x_array = [length, weight]
 
 # Observed/training input and output
-x_train = torch.tensor(x_array).t()  # x_train = [[1], [1.5], [2], [3], [4], [5], [6]]
-y_train = torch.tensor(y_array).t().reshape(-1, 1)  # y_train = [[5], [3.5], [3], [4], [3], [1.5], [2]]
-
+x_train = torch.tensor(x_array, dtype=torch.float).t()
+y_train = torch.tensor(y_array, dtype=torch.float).t().reshape(-1, 1)
 
 class LinearRegressionModel:
     def __init__(self):
