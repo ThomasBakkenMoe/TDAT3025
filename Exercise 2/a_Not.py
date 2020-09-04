@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print("Test: Not(1.0) = " + str(torch.round(model.f(torch.tensor([1.0])).detach()).item()))
     print("Test: Not(0.0) = " + str(torch.round(model.f(torch.tensor([0.0])).detach()).item()))
 
-    fig = plt.figure()
+    fig = plt.figure("NOT")
 
     plot = fig.add_subplot()
 
