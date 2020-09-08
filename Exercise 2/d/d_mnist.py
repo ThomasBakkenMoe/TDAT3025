@@ -1,63 +1,75 @@
 import torch
 import matplotlib.pyplot as plt
-import numpy as np
+import torchvision
 
 
-class SigmoidModel:
+class SoftmaxModel:
     def __init__(self):
-        self.W = torch.tensor([[0.0]], requires_grad=True)
-        self.b = torch.tensor([[0.0]], requires_grad=True)
+        self.W = torch.rand((784, 10), requires_grad=True)
+        self.b = torch.rand((1, 10), requires_grad=True)
 
     def logits(self, x):
         return x @ self.W + self.b
 
     # predictor
     def f(self, x):
-        return torch.sigmoid(self.logits(x))
+        return torch.softmax(self.logits(x), dim=1)
 
     # Cross Entropy loss function
     def loss(self, x, y):
-        return torch.nn.functional.binary_cross_entropy_with_logits(self.logits(x), y)
+        return torch.nn.functional.cross_entropy(self.logits(x), y.argmax(1))
+
+    # Accuracy
+    def accuracy(self, x, y):
+        return torch.mean(torch.eq(self.f(x).argmax(1), y.argmax(1)).float())
 
 if __name__ == '__main__':
-    learning_rate = 0.1
-    epochs = 10000
+    learning_rate = 0.2
+    #epochs = 10000
 
-    model = SigmoidModel()
+    model = SoftmaxModel()
 
-    x_train = torch.tensor([[0.0], [1.0]])
-    y_train = torch.tensor([[1.0], [0.0]])
+    #Training data
+    mnist_train = torchvision.datasets.MNIST('./data', train=True, download=True)
+    x_train = mnist_train.data.reshape(-1, 784).float()  # Reshape input
+    y_train = torch.zeros((mnist_train.targets.shape[0], 10))  # Create output tensor
+    y_train[torch.arange(mnist_train.targets.shape[0]), mnist_train.targets] = 1
 
-    optimizer = torch.optim.SGD([model.W, model.b], learning_rate)
+    #Test data
+    mnist_test = torchvision.datasets.MNIST('./data', train=False, download=True)
+    x_test = mnist_test.data.reshape(-1, 784).float()  # Reshape input
+    y_test = torch.zeros((mnist_test.targets.shape[0], 10))  # Create output tensor
+    y_test[torch.arange(mnist_test.targets.shape[0]), mnist_test.targets] = 1
 
-    for epoch in range(epochs):
-        model.loss(x_train, y_train).backward()
+    #Begin training
+    optimizer = torch.optim.SGD([model.W, model.b], learning_rate, momentum=0.5)
+
+    # Train model until accuracy is above 0.91 (91%)
+    epoch = 0
+    while model.accuracy(x_test, y_test).item() < 0.91:
+        model.loss(x_train, y_train).backward()  # Compute loss gradients
         optimizer.step()
         optimizer.zero_grad()
+        print("Epoch: %s, Loss: %s, Accuracy: %s" % (
+            epoch + 1, model.loss(x_test, y_test).item(), model.accuracy(x_test, y_test).item()))
+        epoch += 1
 
-    print("W = %s, b = %s, loss = %s" % (model.W, model.b, model.loss(x_train, y_train)))
+    #Print result of training
 
-    #Tests
-    print("Test: Not(1.0) = " + str(torch.round(model.f(torch.tensor([1.0])).detach()).item()))
-    print("Test: Not(0.0) = " + str(torch.round(model.f(torch.tensor([0.0])).detach()).item()))
+    print("Model complete: Loss = %s, Accuracy: %s" % (model.loss(x_test, y_test).item(), model.accuracy(x_test, y_test).item()))
 
-    fig = plt.figure("NOT")
+    # ****VISUALS****
+    # Show the input of the first observation in the training set
+    plt.imshow(x_train[0, :].reshape(28, 28))
 
-    plot = fig.add_subplot()
+    # Print the classification of the first observation in the training set
+    print("First observation tensor: %s" % y_train[0, :])
 
-    plt.plot(x_train.detach(), y_train.detach(), 'o', label='$(\\hat x^{(i)},\\hat y^{(i)})$')
+    # Save the input of the first observation in the training set
+    plt.imsave('x_train_%i.png', x_train[0, :].reshape(28, 28))
 
-    plt.xlabel("x")
-    plt.ylabel("y")
-
-    out = torch.reshape(torch.tensor(np.linspace(0, 1, 100).tolist()), (-1, 1))
-
-    plot.set_xticks([0, 1])  # x range from 0 to 1
-    plot.set_yticks([0, 1])  # y range from 0 to 1
-
-    x, indices = torch.sort(out, 0)
-
-    # Plot sigmoid regression curve.
-    plt.plot(x, model.f(x).detach())
+    #Save images
+    for i in range(10):
+        plt.imsave("%i.png" % i, model.W[:, i].reshape(28, 28).detach())
 
     plt.show()
