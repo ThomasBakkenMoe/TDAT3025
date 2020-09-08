@@ -24,7 +24,7 @@ class SoftmaxModel:
         return torch.mean(torch.eq(self.f(x).argmax(1), y.argmax(1)).float())
 
 if __name__ == '__main__':
-    learning_rate = 0.2
+    learning_rate = 0.1
     #epochs = 10000
 
     model = SoftmaxModel()
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # Train model until accuracy is above 0.91 (91%)
     epoch = 0
-    while model.accuracy(x_test, y_test).item() < 0.91:
+    while model.accuracy(x_test, y_test).item() < 0.92:
         model.loss(x_train, y_train).backward()  # Compute loss gradients
         optimizer.step()
         optimizer.zero_grad()
@@ -56,19 +56,13 @@ if __name__ == '__main__':
 
     #Print result of training
 
-    print("Model complete: Loss = %s, Accuracy: %s" % (model.loss(x_test, y_test).item(), model.accuracy(x_test, y_test).item()))
+    print("\nModel complete: Loss = %s, Accuracy: %s" % (model.loss(x_test, y_test).item(), model.accuracy(x_test, y_test).item()))
 
     # ****VISUALS****
     # Show the input of the first observation in the training set
     plt.imshow(x_train[0, :].reshape(28, 28))
 
-    # Print the classification of the first observation in the training set
-    print("First observation tensor: %s" % y_train[0, :])
-
-    # Save the input of the first observation in the training set
-    plt.imsave('x_train_%i.png', x_train[0, :].reshape(28, 28))
-
-    #Save images
+    # Save images of W
     for i in range(10):
         plt.imsave("%i.png" % i, model.W[:, i].reshape(28, 28).detach())
 
