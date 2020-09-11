@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # Train model until accuracy is above 0.91 (91%)
     epoch = 0
-    while model.accuracy(x_test, y_test).item() < 0.92:
+    while model.accuracy(x_test, y_test).item() < 0.90:
         model.loss(x_train, y_train).backward()  # Compute loss gradients
         optimizer.step()
         optimizer.zero_grad()
