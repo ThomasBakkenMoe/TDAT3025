@@ -33,11 +33,11 @@ class ConvolutionalNeuralNetworkModel(nn.Module):
         self.logits = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=5, padding=2),
             nn.MaxPool2d(kernel_size=2),
+            nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=5, padding=2),
             nn.MaxPool2d(kernel_size=2),
             nn.Flatten(),
-            nn.Linear(64 * 7 * 7, 1024),
-            nn.Linear(1024, 10))
+            nn.Linear(64 * 7 * 7, 10))
 
     # Predictor
     def f(self, x):
