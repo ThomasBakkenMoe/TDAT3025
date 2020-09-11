@@ -1,0 +1,1 @@
+Accuracy = 97.7% (final, but the model hovered around 98.0% when training)
