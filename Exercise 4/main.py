@@ -26,15 +26,18 @@ class LongShortTermMemoryModel(nn.Module):
 
 
 char_encodings = [
-    [1., 0., 0., 0., 0.],  # ' '
-    [0., 1., 0., 0., 0.],  # 'h'
-    [0., 0., 1., 0., 0.],  # 'e'
-    [0., 0., 0., 1., 0.],  # 'l'
-    [0., 0., 0., 0., 1.],  # 'o'
+    [1., 0., 0., 0., 0., 0., 0., 0.],  # ' '
+    [0., 1., 0., 0., 0., 0., 0., 0.],  # 'h'
+    [0., 0., 1., 0., 0., 0., 0., 0.],  # 'e'
+    [0., 0., 0., 1., 0., 0., 0., 0.],  # 'l'
+    [0., 0., 0., 0., 1., 0., 0., 0.],  # 'o'
+    [0., 0., 0., 0., 0., 1., 0., 0.],  # 'w'
+    [0., 0., 0., 0., 0., 0., 1., 0.],  # 'r'
+    [0., 0., 0., 0., 0., 0., 0., 1.],  # 'd'
 ]
 encoding_size = len(char_encodings)
 
-index_to_char = [' ', 'h', 'e', 'l', 'o']
+index_to_char = [' ', 'h', 'e', 'l', 'o', 'w', 'r', ' d']
 
 x_train = torch.tensor([[char_encodings[0]], [char_encodings[1]], [char_encodings[2]], [char_encodings[3]], [char_encodings[3]],
                         [char_encodings[4]]])  # ' hello'
