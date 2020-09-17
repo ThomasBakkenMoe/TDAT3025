@@ -10,7 +10,7 @@ class LongShortTermMemoryModel(nn.Module):
         self.dense = nn.Linear(128, encoding_size)  # 128 is the state size
 
     def reset(self):  # Reset states prior to new input sequence
-        zero_state = torch.zeros(1, 1, 128)  # Shape: (number of layers, batch size, state size)
+        zero_state = torch.zeros(1, 4, 128)  # Shape: (number of layers, batch size, state size)
         self.hidden_state = zero_state
         self.cell_state = zero_state
 
@@ -51,13 +51,9 @@ encoding_size = len(char_encodings)
 
 index_to_char = [' ', 'h', 'a', 't', 'r', 'c', 'f', 'l', 'm', 'p', 's', 'o', 'n', '🎩', '🐀', '🐈', '🏢', '👨', '🧢', '👦']
 
-x_train = torch.tensor([[char_encodings[0]], [char_encodings[1]], [char_encodings[2]], [char_encodings[3]], [char_encodings[3]],
-                        [char_encodings[4]], [char_encodings[0]], [char_encodings[5]], [char_encodings[4]],
-                        [char_encodings[6]],[char_encodings[3]], [char_encodings[7]], [char_encodings[0]]])  # ' hello world '
+x_train = torch.tensor([[char_encodings[1], char_encodings[2], char_encodings[3], char_encodings[0]], [char_encodings[4], char_encodings[2], char_encodings[3], char_encodings[0]]])
 
-y_train = torch.tensor([char_encodings[1], char_encodings[2], char_encodings[3], char_encodings[3],
-                        char_encodings[4], char_encodings[0], char_encodings[5], char_encodings[4],
-                        char_encodings[6], char_encodings[3], char_encodings[7], char_encodings[0], char_encodings[1]])  # 'hello world h'
+y_train = torch.tensor([char_encodings[13], char_encodings[14]])
 
 model = LongShortTermMemoryModel(encoding_size)
 
@@ -71,7 +67,7 @@ for epoch in range(1000):
     if epoch % 10 == 9:
         # Generate characters from the initial characters ' h'
         model.reset()
-        text = ' h'
+        text = 'hat '
         model.f(torch.tensor([[char_encodings[0]]]))
         y = model.f(torch.tensor([[char_encodings[1]]]))
         text += index_to_char[y.argmax(1)]
