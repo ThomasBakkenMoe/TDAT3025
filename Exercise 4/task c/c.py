@@ -91,6 +91,6 @@ for epoch in range(1000):
     optimizer.step()
     optimizer.zero_grad()
 
-    if epoch % 50 == 9:
+    if epoch % 50 == 9: # Test model every couple of epochs
         print("Epoch %s: Loss: %s | 'hat '=>%s, 'rat'=>%s, 'cat'=>%s, 'flat'=>%s, 'matt'=>%s, 'cap'=>%s, 'son'=>%s 'rt  '=>%s, 'mt  '=>%s"
               % (epoch, loss.item(), generate('hat '), generate('rat '), generate("cat"), generate("flat"), generate("matt"), generate("cap "), generate("son "), generate('rt  '), generate('mt  ')))
